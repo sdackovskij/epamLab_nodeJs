@@ -1,11 +1,16 @@
-const http = require('http');
+const minimist = require('minimist');
 
-const message = 'Hello World!';
-http.createServer((request, response) => {
-  // eslint-disable-next-line no-console
-  console.log(message);
-  response.end(message);
-}).listen(3000, '127.0.0.1', () => {
-  // eslint-disable-next-line no-console
-  console.log('Server is working...');
-});
+const args = minimist(process.argv.slice(2));
+const result = args._.reduce(
+  (sum, current) => `${sum} ${current}`
+)
+  .split("")
+  .reverse()
+  .join("");
+
+if (result.length < args.length) {
+  console.log(result);
+} else {
+  console.log(`Max length limit: ${args.length}. Current length: ${result.length}`);
+}
+

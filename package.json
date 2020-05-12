@@ -25,5 +25,10 @@
     "eslint-plugin-import": "^2.20.2",
     "nodemon": "^2.0.3",
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "meow": "^7.0.1",
+    "minimist": "^1.2.5",
+    "papaparse": "^5.2.0"
   }
 }
