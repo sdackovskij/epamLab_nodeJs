@@ -6,11 +6,14 @@ const csv = require('csvtojson');
 
 
 const printHelp = meow(
-  `
+  ` 
+    How to use:
+        to run program:   node index [SELECT_PROGRAM] [SELECT_OPTIONS] -- [Additional info (ex. string for reverse)]
+
     Main options:
         -h, --help        print help info
         -r, --rvstring    run string reverse program (without option will reverse all string)
-        -c, --csvtojson   run csv to json program (without options will convert all files in directory)
+        -c, --csvtojson   run csv to json program (without options will convert all files in input directory)
 
     String reverse options:
         -l, --length       set max length of string
