@@ -1,60 +1,86 @@
 /* eslint-disable no-console */
 const express = require('express');
 
+const mongoose = require('mongoose');
+
 const fs = require('fs');
 
+const PokemonModel = require('./schema');
+
 const PORT = 3000;
+
+const DB = 'mongodb+srv://sdackovskij:0zdtsbBiweDOodc0@pokemonnodelab-rpazt.mongodb.net/MyFirstDB?retryWrites=true&w=majority';
 
 const app = express();
 app.use(express.json());
 
 const pokemons = JSON.parse(fs.readFileSync('./pokemons.json', () => {}));
-const wrPokemons = () => fs.writeFile('./pokemons.json', JSON.stringify(pokemons), () => {});
 
 app.get('/pokemons', (req, res) => {
   if (Object.keys(req.query).length) {
-    res.send(pokemons.filter((pokemon) => pokemon.name === req.query.name));
+    PokemonModel.find({ name: req.query.name }, (err, docs) => {
+      res.send(docs);
+    });
   } else {
-    res.send(pokemons);
+    PokemonModel.find({}, (err, docs) => {
+      res.send(docs);
+    });
   }
 });
 
 app.get('/pokemons/caught-list', (req, res) => {
-  res.send(pokemons.filter((pokemon) => pokemon.isMy === true));
+  PokemonModel.find({ isMy: true }, (err, docs) => {
+    res.send(docs);
+  });
 });
 
 app.get('/pokemons/caught', (req, res) => {
-  const updPokemon = pokemons.find((pokemon) => +pokemon.id === +req.query.id);
-  updPokemon.isMy = !updPokemon.isMy;
-  wrPokemons();
-  res.send(`Pokemon caught: ${updPokemon.isMy}`);
+  PokemonModel.find({ id: req.query.id }, (err, docs) => {
+    PokemonModel.updateOne({ id: docs[0].id }, { isMy: !docs[0].isMy }, () => {
+      res.send(`Pokemon caught: ${!docs[0].isMy}`);
+    });
+  });
 });
 
 app.get('/pokemons/id-search', (req, res) => {
-  res.send(pokemons.filter((pokemon) => +pokemon.id === +req.query.id));
+  PokemonModel.find({ id: req.query.id }, (err, docs) => {
+    res.send(docs);
+  });
 });
 
 app.post('/pokemons/create', (req, res) => {
-  const newPokemon = req.body;
-  newPokemon.id = Object.keys(pokemons).length + 1;
-  pokemons.push(newPokemon);
-  wrPokemons();
-  res.send('Pokemon was created!');
+  PokemonModel.create({ ...req.body }, () => {
+    res.send('Pokemon was created!');
+  });
 });
 
 app.put('/pokemons/update', (req, res) => {
-  const updPokemon = pokemons.find((pokemon) => +pokemon.id === +req.query.id);
-  Object.assign(updPokemon, req.body);
-  wrPokemons();
-  res.send('Pokemon was updated!');
+  PokemonModel.updateOne({ id: req.query.id }, { ...req.body }, () => {
+    res.send('Pokemon was updated!');
+  });
 });
 
 app.delete('/pokemons/delete', (req, res) => {
-  pokemons.splice(req.query.id - 1, req.query.id - 1);
-  wrPokemons();
-  res.send('Pokemon was deleted!');
+  PokemonModel.findOneAndDelete({ id: req.query.id }, () => {
+    res.send('Pokemon was deleted!');
+  });
 });
 
-app.listen(PORT, () => {
-  console.log('Server running...');
-});
+
+async function init() {
+  try {
+    await mongoose.connect(DB, { useNewUrlParser: true, useUnifiedTopology: true });
+    app.listen(PORT, () => {
+      console.log('Server running...');
+    });
+    PokemonModel.estimatedDocumentCount((err, count) => {
+      if (!count) {
+        PokemonModel.create(...pokemons);
+      }
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+init();
