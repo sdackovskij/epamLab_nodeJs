@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js",
+    "test": "nyc mocha ./test",
     "eslint": "eslint --max-warnings 0 --ext .js ./"
   },
   "repository": {
@@ -20,10 +21,15 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
+    "mocha": "^8.0.1",
     "nodemon": "^2.0.3",
+    "nyc": "^15.1.0",
+    "sinon": "^9.0.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
